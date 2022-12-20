@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "template to create the cloud formation"
+Resources:
+  WebServer1:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: ami-0cca134ec43cf708f
+      InstanceType: t2.micro
+      KeyName: chefkeypair
+      Tags:
+        - Key: Name
+          Value: Server-1
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: 'true'
+          DeviceIndex: '0'
+          DeleteOnTermination": "false"
+          SubnetId: subnet-022c420c8dc1dca86
+          GroupSet: sg-005a303e78fdacacd
