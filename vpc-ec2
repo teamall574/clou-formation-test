@@ -104,7 +104,7 @@ Resources:
       CidrBlock: !Ref PublicSubnetCIDR
       Tags:
         - Key: Name
-          Value: !Ref PublicSubnetCIDR
+          Value: public-subnet1
         - Key: CloudFormationStack
           Value: !Ref 'AWS::StackId'
   PublicSubnet2:
@@ -115,7 +115,7 @@ Resources:
       CidrBlock: !Ref PublicSubnetCIDR2
       Tags:
         - Key: Name
-          Value: !Ref PublicSubnetCIDR2
+          Value: public-subnet2
         - Key: CloudFormationStack
           Value: !Ref 'AWS::StackId'
   PrivateSubnet1:
@@ -126,7 +126,7 @@ Resources:
       CidrBlock: !Ref PrivateSubnetCIDR1
       Tags:
         - Key: Name
-          Value: !Ref PrivateSubnetCIDR1
+          Value: private-subnet1
         - Key: CloudFormationStack
           Value: !Ref 'AWS::StackId'
   PrivateSubnet2:
@@ -137,7 +137,7 @@ Resources:
       CidrBlock: !Ref PrivateSubnetCIDR2
       Tags:
         - Key: Name
-          Value: !Ref PrivateSubnetCIDR2
+          Value: private-subnet2
         - Key: CloudFormationStack
           Value: !Ref 'AWS::StackId'
   AttachGateway:
@@ -151,7 +151,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Ref PublicSubnetCIDR
+          Value: public-route
         - Key: CloudFormationStack
           Value: !Ref 'AWS::StackId'
   PublicRoute:
@@ -177,25 +177,9 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Ref PrivateSubnetCIDR1
+          Value: private-route
         - Key: CloudFormationStack
           Value: !Ref 'AWS::StackId'
-  PrivateRoute:
-    Type: 'AWS::EC2::Route'
-    DependsOn: AttachGateway
-    Properties:
-      RouteTableId: !Ref PrivateSubnetRouteTable
-      GatewayId: !Ref InternetGateway
-  PrivateSubnetRouteTableAssociation1:
-    Type: 'AWS::EC2::SubnetRouteTableAssociation'
-    Properties:
-      SubnetId: !Ref PrivateSubnet1
-      RouteTableId: !Ref PrivateSubnetRouteTable
-  PrivateSubnetRouteTableAssociation2:
-    Type: 'AWS::EC2::SubnetRouteTableAssociation'
-    Properties:
-      SubnetId: !Ref PrivateSubnet2
-      RouteTableId: !Ref PrivateSubnetRouteTable
   PublicInstanceSG:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
@@ -217,20 +201,4 @@ Resources:
           Value: !Ref VPCCIDR
         - Key: CloudFormationStack
           Value: !Ref 'AWS::StackId'
-  WebServer1:
-    Type: 'AWS::EC2::Instance'
-    Properties:
-      ImageId: ami-0cca134ec43cf708f
-      InstanceType: t2.micro
-      KeyName: chefkeypair
-      Tags:
-        - Key: Name
-          Value: Server-1
-      NetworkInterfaces:
-        - AssociatePublicIpAddress: 'true'
-          DeviceIndex: '0'
-          DeleteOnTermination: 'true'
-          SubnetId: !Ref PublicSubnet
-          GroupSet:
-            - !Ref PublicInstanceSG
-      
+  
