@@ -213,7 +213,7 @@ Resources:
         - Key: CloudFormationStack
           Value: 
             Ref: 'AWS::StackId'
-  PriavteSubnet1RouteTableAssociation:
+  PrivateSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId:
@@ -249,4 +249,18 @@ Resources:
       - Key: CloudFormationStack
         Value:
           Ref: AWS::StackId
-
+  WebServer1:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: ami-0cca134ec43cf708f
+      InstanceType: t2.micro
+      KeyName: chefkeypair
+      Tags:
+        - Key: Name
+          Value: Server-1
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: 'true'
+          DeviceIndex: '0'
+          DeleteOnTermination: "true"
+          SubnetId: subnet-091f52bc3fb1bff59
+          GroupSet: sg-0ee70bfa8944813a1
