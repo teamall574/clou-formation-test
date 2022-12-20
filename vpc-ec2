@@ -1,0 +1,236 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "template to create the cloud formation"
+Metadata:
+  'AWS::CloudFormation::Interface':
+    ParameterGroups:
+      - Label:
+          default: VPC configuration parameters
+        Parameters:
+          - VPCNAME
+          - VPCCIDR
+          - PublicSubnetCIDR
+          - PublicSubnetCIDR2
+          - PrivateSubnetCIDR1
+          - PrivateSubnetCIDR2
+          - SSHLocation
+    ParameterLabels:
+      VPCNAME:
+        default: Name of new VPC
+      VPCCIDR:
+        default: Enter CIDR of new VPC
+      PublicSubnetCIDR:
+        default: Enter CIDR of the public subnet
+      PublicSubnetCIDR2:
+        default: Enter CIDR of the public subnet
+      PrivateSubnetCIDR1:
+        default: Enter CIDR of the private subnet
+      PrivateSubnetCIDR2:
+        default: Enter CIDR of the private subnet
+      SSHLocation:
+        default: Subnet allowed to ssh on TCP to public subnet
+Parameters:
+  VPCNAME:
+    Default: TEST-VPC
+    Description: CIDR block for entire VPC.
+    Type: String
+  VPCCIDR:
+    AllowedPattern: >-
+      ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.10.0.0/16
+    Description: CIDR block for entire VPC.
+    Type: String
+  PublicSubnetCIDR:
+    AllowedPattern: >-
+      ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.10.10.0/24
+    Description: CIDR block for the public subnet
+    Type: String
+  PublicSubnetCIDR2:
+    AllowedPattern: >-
+      ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.10.20.0/24
+    Description: CIDR block for the public subnet
+    Type: String
+  PrivateSubnetCIDR1:
+    AllowedPattern: >-
+      ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.10.50.0/24
+    Description: CIDR block for the private subnet
+    Type: String
+  PrivateSubnetCIDR2:
+    AllowedPattern: >-
+      ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.10.60.0/24
+    Description: CIDR block for the private subnet
+    Type: String
+  SSHLocation:
+    AllowedPattern: >-
+      ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(/([0-9]|[1-2][0-9]|3[0-2]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/0-28
+    Default: 0.0.0.0/0
+    Description: Network allowed to ssh to instances in public subnet.
+    Type: String
+Mappings: {}
+Resources:
+  VPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      CidrBlock: !Ref VPCCIDR
+      Tags:
+        - Key: Name
+          Value: !Ref VPCNAME
+        - Key: CloudFormationStack
+          Value: !Ref 'AWS::StackId'
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: Name
+          Value: IGW
+        - Key: CloudFormationStack
+          Value: !Ref 'AWS::StackId'
+  PublicSubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: ap-south-1a
+      CidrBlock: !Ref PublicSubnetCIDR
+      Tags:
+        - Key: Name
+          Value: !Ref PublicSubnetCIDR
+        - Key: CloudFormationStack
+          Value: !Ref 'AWS::StackId'
+  PublicSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: ap-south-1b
+      CidrBlock: !Ref PublicSubnetCIDR2
+      Tags:
+        - Key: Name
+          Value: !Ref PublicSubnetCIDR2
+        - Key: CloudFormationStack
+          Value: !Ref 'AWS::StackId'
+  PrivateSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: ap-south-1a
+      CidrBlock: !Ref PrivateSubnetCIDR1
+      Tags:
+        - Key: Name
+          Value: !Ref PrivateSubnetCIDR1
+        - Key: CloudFormationStack
+          Value: !Ref 'AWS::StackId'
+  PrivateSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: ap-south-1b
+      CidrBlock: !Ref PrivateSubnetCIDR2
+      Tags:
+        - Key: Name
+          Value: !Ref PrivateSubnetCIDR2
+        - Key: CloudFormationStack
+          Value: !Ref 'AWS::StackId'
+  AttachGateway:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+  PublicSubnetRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Ref PublicSubnetCIDR
+        - Key: CloudFormationStack
+          Value: !Ref 'AWS::StackId'
+  PublicRoute:
+    Type: 'AWS::EC2::Route'
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  PublicSubnetRouteTableAssociation1:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicSubnetRouteTable
+  PublicSubnetRouteTableAssociation2:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicSubnetRouteTable
+  PrivateSubnetRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Ref PrivateSubnetCIDR1
+        - Key: CloudFormationStack
+          Value: !Ref 'AWS::StackId'
+  PrivateRoute:
+    Type: 'AWS::EC2::Route'
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PrivateSubnetRouteTable
+      GatewayId: !Ref InternetGateway
+  PrivateSubnetRouteTableAssociation1:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref PrivateSubnetRouteTable
+  PrivateSubnetRouteTableAssociation2:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref PrivateSubnetRouteTable
+  PublicInstanceSG:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: Enable SSH access via port 22
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: !Ref SSHLocation
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: '-1'
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Ref VPCCIDR
+        - Key: CloudFormationStack
+          Value: !Ref 'AWS::StackId'
+  WebServer1:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: ami-0cca134ec43cf708f
+      InstanceType: t2.micro
+      KeyName: chefkeypair
+      Tags:
+        - Key: Name
+          Value: Server-1
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: 'true'
+          DeviceIndex: '0'
+          DeleteOnTermination: 'true'
+          SubnetId: !Ref PublicSubnet
+          GroupSet:
+            - !Ref PublicInstanceSG
+      
